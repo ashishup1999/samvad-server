@@ -34,12 +34,22 @@ const CreateChat = async (req, res) => {
     await createChat(sender, receiver, msg);
     res.send({ status: "SUCCESS" });
   } catch (error) {
-    console.log(error);
     res.send({ status: "ERROR" });
+  }
+};
+
+const GetUserInfo = async (req, res) => {
+  try {
+    const { username } = req.params;
+    const { fullName, email } = await getUserInfo(username);
+    res.send({ fullName, email });
+  } catch {
+    res.send({ status: "ERROR", message: "Unable to fetch the user" });
   }
 };
 
 module.exports = {
   GetAllLatestChats,
   CreateChat,
+  GetUserInfo,
 };
