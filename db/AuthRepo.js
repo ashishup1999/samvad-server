@@ -1,65 +1,47 @@
-const { clientDB } = require("../dbConn");
 const {
   deleteNullUndefinedFromObj,
   isObjectEmpty,
 } = require("../utils/Utility");
-const { USER_QUERY } = require("./queries/user");
+const User = require("../model/User");
+const Otp = require("../model/Otp");
 
-const addUser = async ({ fullname, email, username, password }) => {
-  await clientDB.query(USER_QUERY.ADD_USER, [
-    fullname,
-    email,
-    username,
-    password,
-  ]);
-  const userId = (await clientDB.query(USER_QUERY.GET_USERID, [username]))
-    ?.rows?.[0]?.user_id;
-  return userId;
+const addUser = async ({ fullName, email, username, password }) => {
+  await User.create({ fullName, email, username, password });
 };
 
-const updateUser = async (userId, updateKey, updateValue) => {
-  await clientDB.query(USER_QUERY[`UPDATE_${updateKey.toUpperCase()}`], [
-    userId,
-    updateValue,
-  ]);
+const updateUser = async (email, updateKey, updateValue) => {
+  await User.updateOne({ email }, { [updateKey]: updateValue });
 };
 
 const getUser = async (key, value) => {
-  const userObj = (
-    await clientDB.query(USER_QUERY[`GET_USER_BY_${key.toUpperCase()}`], [
-      value,
-    ])
-  )?.rows?.[0];
+  const userObj = await User.findOne({ [key]: value }).exec();
   const payload = {
-    userId: userObj?.user_id,
     username: userObj?.username,
     email: userObj?.email,
     password: userObj?.password,
-    fullName: userObj?.fullname,
+    fullName: userObj?.fullName,
   };
   deleteNullUndefinedFromObj(payload);
   return isObjectEmpty(payload) && payload;
 };
 
-const deleteUser = async (userId) => {
-  await clientDB.query(USER_QUERY.DELETE_USER, [userId]);
+const deleteUser = async (username) => {
+  await User.deleteOne({ username });
 };
 
 const createOTP = async (email) => {
-  const alereadyOtp = await clientDB.query(USER_QUERY.GET_OTP, [email])
-    ?.rows?.[0]?.otp;
+  const alereadyOtp = await Otp.findOne({ email }).exec();
   const otp = Math.floor(100000 + Math.random() * 900000);
   if (alereadyOtp) {
-    await clientDB.query(USER_QUERY.UPDATE_OTP, [email, otp]);
+    await Otp.updateOne({ email }, { otp });
     return otp;
   }
-  await clientDB.query(USER_QUERY.CREATE_OTP, [email, otp]);
+  await Otp.create({ email, otp });
   return otp;
 };
 
 const getOTP = async (email) => {
-  // console.log(await clientDB.query(USER_QUERY.GET_OTP, [email]))
-  return (await clientDB.query(USER_QUERY.GET_OTP, [email]))?.rows?.[0]?.otp;
+  return (await Otp.findOne({ email }).exec())?.otp;
 };
 
 module.exports = {

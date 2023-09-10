@@ -6,6 +6,7 @@ const {
   updateUser,
 } = require("../db/AuthRepo");
 const nodemailer = require("nodemailer");
+const { decryptData } = require("../utils/Encryption");
 
 const AuthenticateUser = async (req, res) => {
   try {
@@ -14,11 +15,11 @@ const AuthenticateUser = async (req, res) => {
       (await getUser("email", email)) || (await getUser("username", username));
     if (!user) {
       res.send({ status: "ERROR", responseCd: "USER_NOT_FOUND" });
-    } else if (user?.password === password) {
+    } else if (decryptData(user?.password) === decryptData(password)) {
       res.send({
         status: "SUCCESS",
         isAuthenticated: true,
-        userId: user?.userId,
+        fullName: user?.fullName,
         responseCd: "0",
       });
     } else {
@@ -31,7 +32,7 @@ const AuthenticateUser = async (req, res) => {
 
 const SignUpUser = async (req, res) => {
   try {
-    const { fullname, username, email, password } = req.body;
+    const { fullName, username, email, password } = req.body;
     if (
       (await getUser("email", username)) ||
       (await getUser("username", username))
@@ -43,8 +44,12 @@ const SignUpUser = async (req, res) => {
     ) {
       res.send({ status: "SUCCESS", responseCd: "EMAIL_ALLREADY_EXISTS" });
     } else {
-      const userId = await addUser({ fullname, username, email, password });
-      res.send({ status: "SUCCESS", responseCd: "0", userId });
+      await addUser({ fullName, username, email, password });
+      res.send({
+        status: "SUCCESS",
+        responseCd: "0",
+        message: "User Created Successully",
+      });
     }
   } catch (error) {
     console.log(error);
@@ -135,8 +140,8 @@ const VerifyOtp = async (req, res) => {
 
 const UpdateUserPassword = async (req, res) => {
   try {
-    const { userId, password } = req.body;
-    await updateUser(userId, "password", password);
+    const { email, password } = req.body;
+    await updateUser(email, "password", password);
     res.send({
       status: "SUCCESS",
       responseCd: "0",

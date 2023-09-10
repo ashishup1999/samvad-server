@@ -1,22 +1,30 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
-const { startDBServer } = require("./dbConn");
+const mongoose = require("mongoose");
 const authRouter = require("./controller/AuthController");
+const homeRouter = require("./controller/HomeController");
 
-startDBServer();
+// Connect to MongoDB database
+mongoose
+  .connect(process.env.MONGO_DB_URI, { useNewUrlParser: true })
+  .then(() => {
+    console.log("DATABASE SERVER ON");
+  });
 
 app.use(cors());
 app.use(express.json());
 app.use(authRouter);
+app.use(homeRouter);
 
-const server = http.createServer(app);
+const chatServer = http.createServer(app);
 
-const io = new Server(server, {
+const io = new Server(chatServer, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: process.env.CLIENT_URI,
     methods: ["GET", "POST"],
   },
 });
@@ -27,11 +35,11 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(3001, () => {
-  console.log("CHAT SERVER ACTIVE ON PORT: ",3001 );
+chatServer.listen(process.env.CHAT_SERVER_PORT, () => {
+  console.log("CHAT SERVER ACTIVE ON PORT: ", 3001);
 });
 
-app.listen(3002, function (err) {
+app.listen(process.env.API_SERVER_PORT, function (err) {
   if (err) console.log(err);
   console.log("API SERVER ACTIVE ON PORT: ", 3002);
 });
