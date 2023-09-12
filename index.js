@@ -29,11 +29,7 @@ const io = new Server(chatServer, {
   },
 });
 
-io.on("connection", (socket) => {
-  socket.on("send_message", (msg) => {
-    socket.broadcast.emit("receive_message", msg);
-  });
-});
+require("./controller/SocketController")(io); // passing io to socket controller
 
 chatServer.listen(process.env.CHAT_SERVER_PORT, () => {
   console.log("CHAT SERVER ACTIVE ON PORT: ", 3001);
