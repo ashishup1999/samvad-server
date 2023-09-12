@@ -3,6 +3,7 @@ const {
   getAllLatestChats,
   addMsgToChat,
   createChat,
+  getChatInfoByChatId,
 } = require("../db/HomeRepo");
 
 const GetAllLatestChats = async (req, res) => {
@@ -53,9 +54,24 @@ const GetUserInfo = async (req, res) => {
     const { username } = req.params;
     const { fullName, email } = await getUserInfo(username);
     res.send({ fullName, email });
-  } catch {
+  } catch (error) {
     console.log(error);
     res.send({ status: "ERROR", message: "Unable to fetch the user" });
+  }
+};
+
+const GetChatInfoByChatId = async (req, res) => {
+  try {
+    const { username } = req.params;
+    const { chatId } = req.query;
+    const result = await getChatInfoByChatId(username, chatId);
+    res.send(result);
+  } catch (error) {
+    console.log(error);
+    res.send({
+      status: "ERROR",
+      message: "unable to fetch usersInfo at the moment",
+    });
   }
 };
 
@@ -64,4 +80,5 @@ module.exports = {
   CreateChat,
   AddMsgToChat,
   GetUserInfo,
+  GetChatInfoByChatId,
 };
