@@ -7,13 +7,14 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const authRouter = require("./controller/AuthController");
 const homeRouter = require("./controller/HomeController");
+const mongoDbURI = `mongodb+srv://${process.env.DB_USER}:${encodeURIComponent(
+  process.env.DB_PASSWORD
+)}@${process.env.DB_NAME}.kh4xc50.mongodb.net/?retryWrites=true&w=majority`;
 
 // Connect to MongoDB database
-mongoose
-  .connect(process.env.MONGO_DB_URI, { useNewUrlParser: true })
-  .then(() => {
-    console.log("DATABASE SERVER ON");
-  });
+mongoose.connect(mongoDbURI, { useNewUrlParser: true }).then(() => {
+  console.log("DATABASE SERVER ON");
+});
 
 app.use(cors());
 app.use(express.json());
