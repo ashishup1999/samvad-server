@@ -4,6 +4,7 @@ const {
   addMsgToChat,
   createChat,
   getChatInfoByChatId,
+  getUsersOnSearch,
 } = require("../db/HomeRepo");
 
 const GetAllLatestChats = async (req, res) => {
@@ -30,8 +31,8 @@ const GetAllLatestChats = async (req, res) => {
 const CreateChat = async (req, res) => {
   try {
     const { usernames } = req.body;
-    await createChat(usernames);
-    res.send({ status: "SUCCESS" });
+    const chatId = await createChat(usernames);
+    res.send({ status: "SUCCESS", chatId });
   } catch (error) {
     console.log(error);
     res.send({ status: "ERROR" });
@@ -75,10 +76,26 @@ const GetChatInfoByChatId = async (req, res) => {
   }
 };
 
+const GetUsersOnSearch = async (req, res) => {
+  try {
+    const { username } = req.params;
+    const { search } = req.query;
+    const result = await getUsersOnSearch(username, search);
+    res.send(result);
+  } catch (error) {
+    console.log(error);
+    res.send({
+      status: "ERROR",
+      message: "unable to search users at the moment",
+    });
+  }
+};
+
 module.exports = {
   GetAllLatestChats,
   CreateChat,
   AddMsgToChat,
   GetUserInfo,
   GetChatInfoByChatId,
+  GetUsersOnSearch,
 };

@@ -1,9 +1,13 @@
 const Chat = require("../model/Chat");
+const User = require("../model/User");
 const { deleteNullUndefinedFromObj } = require("../utils/Utility");
 const { getUserInfo } = require("./CommonRepo");
 
 const getAllLatestChats = async (username) => {
-  const allLatestChat = await Chat.find({ usernames: username }).exec();
+  const allLatestChat = await Chat.find({
+    usernames: username,
+    msgs: { $not: { $size: 0 } },
+  }).exec();
   return allLatestChat?.map((obj) => ({
     chatId: obj?.chatId,
     otherUser: obj?.usernames?.filter((uname) => uname !== username)?.[0],
@@ -12,7 +16,17 @@ const getAllLatestChats = async (username) => {
 };
 
 const createChat = async (usernames) => {
-  await Chat.create({ usernames });
+  const chat = await Chat.find({
+    $and: [
+      { usernames: { $all: usernames } },
+      { usernames: { $size: usernames.length } },
+    ],
+  }).exec();
+  if (chat.length !== 0) {
+    return chat[0]?.chatId;
+  }
+  const res = await Chat.create({ usernames });
+  return res?.chatId;
 };
 
 const addMsgToChat = async (chatId, msgObj) => {
@@ -45,9 +59,23 @@ const getChatInfoByChatId = async (username, chatId) => {
   };
 };
 
+const getUsersOnSearch = async (username, searchkey) => {
+  const users = await User.find({
+    $and: [
+      { username: { $ne: username } },
+      { username: { $regex: searchkey } },
+    ],
+  })
+    .select("username email fullName -_id")
+    .sort({ username: 1 })
+    .limit(10);
+  return users;
+};
+
 module.exports = {
   getAllLatestChats,
   addMsgToChat,
   createChat,
   getChatInfoByChatId,
+  getUsersOnSearch,
 };

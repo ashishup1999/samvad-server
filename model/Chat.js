@@ -14,7 +14,7 @@ const ChatSchema = new Schema({
         sender: { type: String },
         type: { type: String, default: "text" },
         seen: { type: Boolean },
-        sentAt: { type: Date, default: new Date() },
+        sentAt: { type: Date, default: Date.now() },
         deliveredAt: { type: Date },
         seenAt: { type: Date },
       },
