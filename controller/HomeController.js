@@ -7,6 +7,7 @@ const {
   AddMsgToChat,
   GetChatInfoByChatId,
   GetUsersOnSearch,
+  GetUsernamesByChatId,
 } = require("../service/HomeService");
 
 router.get("/getAllChats/:username", GetAllLatestChats);
@@ -15,5 +16,6 @@ router.post("/addMsgToChat", AddMsgToChat);
 router.get("/getUserInfo/:username", GetUserInfo);
 router.get("/getChatInfoByChatId/:username", GetChatInfoByChatId);
 router.get("/getUsersOnSearch/:username", GetUsersOnSearch);
+router.get("/getUsernamesByChatId/:chatId", GetUsernamesByChatId);
 
 module.exports = router;

@@ -15,8 +15,12 @@ const joinRoom = async (socket) => {
 const messageSendingAndReceiving = (socket) => {
   socket.on(SOCKET_NAMES.SEND_MSG, async (req) => {
     //getting from sender to server
-    const { chatId, msgObj } = req;
-    socket.to(chatId).emit(SOCKET_NAMES.RECEIVE_MSG, req); //sending from server to receiver
+    const { chatId, msgObj, isSelectedChatNew } = req;
+    if (isSelectedChatNew) {
+      socket.broadcast.emit(SOCKET_NAMES.NEW_MESSAGE, chatId); // sending to all
+    } else {
+      socket.to(chatId).emit(SOCKET_NAMES.RECEIVE_MSG, req); //sending from server to personal room
+    }
     //add msg to db
     await addMsgToChat(chatId, msgObj);
   });

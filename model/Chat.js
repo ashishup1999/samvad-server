@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { v4: uuidv4 } = require("uuid");
 const { DB_COLLECTIONS } = require("../constants/CommonConstants");
+const moment = require("moment/moment");
 const { Schema, model } = mongoose;
 
 const ChatSchema = new Schema({
@@ -14,7 +15,7 @@ const ChatSchema = new Schema({
         sender: { type: String },
         type: { type: String, default: "text" },
         seen: { type: Boolean },
-        sentAt: { type: Date, default: Date.now() },
+        sentAt: { type: Date, default: moment().valueOf() },
         deliveredAt: { type: Date },
         seenAt: { type: Date },
       },

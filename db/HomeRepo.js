@@ -40,7 +40,9 @@ const addMsgToChat = async (chatId, msgObj) => {
 };
 
 const getChatInfoByChatId = async (username, chatId) => {
-  const { usernames, msgs } = (await Chat.find({ chatId }).exec())?.[0];
+  const { usernames, msgs } = (
+    await Chat.find({ chatId, usernames: username }).exec()
+  )?.[0];
   const otherUsersInfo = usernames.filter((uname) => uname !== username);
   const otherUsers = [];
   for (let i = 0; i < otherUsersInfo.length; i++) {
@@ -57,6 +59,11 @@ const getChatInfoByChatId = async (username, chatId) => {
       seen: msgObj?.seen,
     })),
   };
+};
+
+const getUsernamesByChatId = async (chatId) => {
+  const { usernames } = (await Chat.find({ chatId }).exec())?.[0];
+  return usernames;
 };
 
 const getUsersOnSearch = async (username, searchkey) => {
@@ -78,4 +85,5 @@ module.exports = {
   createChat,
   getChatInfoByChatId,
   getUsersOnSearch,
+  getUsernamesByChatId,
 };

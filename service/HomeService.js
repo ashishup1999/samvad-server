@@ -5,6 +5,7 @@ const {
   createChat,
   getChatInfoByChatId,
   getUsersOnSearch,
+  getUsernamesByChatId,
 } = require("../db/HomeRepo");
 
 const GetAllLatestChats = async (req, res) => {
@@ -76,6 +77,20 @@ const GetChatInfoByChatId = async (req, res) => {
   }
 };
 
+const GetUsernamesByChatId = async (req, res) => {
+  try {
+    const { chatId } = req.params;
+    const usernames = await getUsernamesByChatId(chatId);
+    res.send({ usernames });
+  } catch (error) {
+    console.log(error);
+    res.send({
+      status: "ERROR",
+      message: "unable to fetch usersInfo at the moment",
+    });
+  }
+};
+
 const GetUsersOnSearch = async (req, res) => {
   try {
     const { username } = req.params;
@@ -98,4 +113,5 @@ module.exports = {
   GetUserInfo,
   GetChatInfoByChatId,
   GetUsersOnSearch,
+  GetUsernamesByChatId,
 };

@@ -13,7 +13,8 @@ const SOCKET_NAMES = {
   MSG_DELIVERED: "msg_delivered",
   MSG_SEEN: "msg_seen",
   CREATE_ROOM: "create_room",
-  JOIN_ROOM:"join_room",
+  JOIN_ROOM: "join_room",
+  NEW_MESSAGE: "new_msg",
 };
 
 module.exports = { DB_COLLECTIONS, SOCKET_NAMES };
