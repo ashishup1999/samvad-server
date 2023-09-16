@@ -6,6 +6,7 @@ const {
   getChatInfoByChatId,
   getUsersOnSearch,
   getUsernamesByChatId,
+  deleteMsgs,
 } = require("../db/HomeRepo");
 
 const GetAllLatestChats = async (req, res) => {
@@ -106,6 +107,20 @@ const GetUsersOnSearch = async (req, res) => {
   }
 };
 
+const DeleteMsgs = async (req, res) => {
+  try {
+    const { chatId, msgIds } = req.body;
+    await deleteMsgs(chatId, msgIds);
+    res.send({ status: "SUCCESS", message: "Message deleted Successfuly" });
+  } catch (error) {
+    console.log(error);
+    res.send({
+      status: "ERROR",
+      message: "unable to delete message at the moment",
+    });
+  }
+};
+
 module.exports = {
   GetAllLatestChats,
   CreateChat,
@@ -114,4 +129,5 @@ module.exports = {
   GetChatInfoByChatId,
   GetUsersOnSearch,
   GetUsernamesByChatId,
+  DeleteMsgs,
 };

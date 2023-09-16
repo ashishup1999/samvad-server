@@ -10,6 +10,7 @@ const addMsgToChat = async (chatId, msgObj) => {
     sender: msgObj.sender,
     msg: msgObj.msg,
     type: msgObj.type,
+    sentAt: msgObj.sentAt,
   };
   deleteNullUndefinedFromObj(msgPayload);
   await Chat.updateOne({ chatId }, { $push: { msgs: msgPayload } });

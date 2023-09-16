@@ -79,6 +79,13 @@ const getUsersOnSearch = async (username, searchkey) => {
   return users;
 };
 
+const deleteMsgs = async (chatId, msgIds) => {
+  await Chat.updateMany(
+    { chatId },
+    { $pull: { msgs: { msgId: { $in: msgIds } } } }
+  );
+};
+
 module.exports = {
   getAllLatestChats,
   addMsgToChat,
@@ -86,4 +93,5 @@ module.exports = {
   getChatInfoByChatId,
   getUsersOnSearch,
   getUsernamesByChatId,
+  deleteMsgs,
 };
