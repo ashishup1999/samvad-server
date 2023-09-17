@@ -20,6 +20,7 @@ const AuthenticateUser = async (req, res) => {
         status: "SUCCESS",
         isAuthenticated: true,
         fullName: user?.fullName,
+        profileImg: user?.profileImg,
         responseCd: "0",
       });
     } else {
@@ -32,7 +33,7 @@ const AuthenticateUser = async (req, res) => {
 
 const SignUpUser = async (req, res) => {
   try {
-    const { fullName, username, email, password } = req.body;
+    const { fullName, username, email, password, profileImg } = req.body;
     if (
       (await getUser("email", username)) ||
       (await getUser("username", username))
@@ -44,7 +45,7 @@ const SignUpUser = async (req, res) => {
     ) {
       res.send({ status: "SUCCESS", responseCd: "EMAIL_ALLREADY_EXISTS" });
     } else {
-      await addUser({ fullName, username, email, password });
+      await addUser({ fullName, username, email, password, profileImg });
       res.send({
         status: "SUCCESS",
         responseCd: "0",

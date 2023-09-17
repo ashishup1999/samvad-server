@@ -55,8 +55,8 @@ const AddMsgToChat = async (req, res) => {
 const GetUserInfo = async (req, res) => {
   try {
     const { username } = req.params;
-    const { fullName, email } = await getUserInfo(username);
-    res.send({ fullName, email });
+    const { fullName, email, profileImg } = await getUserInfo(username);
+    res.send({ fullName, email, profileImg });
   } catch (error) {
     console.log(error);
     res.send({ status: "ERROR", message: "Unable to fetch the user" });

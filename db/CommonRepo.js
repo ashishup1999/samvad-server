@@ -6,6 +6,7 @@ const getUserInfo = async (username) => {
     username: userInfo?.username,
     fullName: userInfo?.fullName,
     email: userInfo?.email,
+    profileImg: userInfo?.profileImg,
   };
 };
 

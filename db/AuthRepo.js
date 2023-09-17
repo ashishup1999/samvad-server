@@ -5,8 +5,8 @@ const {
 const User = require("../model/User");
 const Otp = require("../model/Otp");
 
-const addUser = async ({ fullName, email, username, password }) => {
-  await User.create({ fullName, email, username, password });
+const addUser = async ({ fullName, email, username, password, profileImg }) => {
+  await User.create({ fullName, email, username, password, profileImg });
 };
 
 const updateUser = async (email, updateKey, updateValue) => {
@@ -20,6 +20,7 @@ const getUser = async (key, value) => {
     email: userObj?.email,
     password: userObj?.password,
     fullName: userObj?.fullName,
+    profileImg: userObj?.profileImg,
   };
   deleteNullUndefinedFromObj(payload);
   return isObjectEmpty(payload) && payload;

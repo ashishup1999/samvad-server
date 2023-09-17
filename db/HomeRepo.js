@@ -73,7 +73,7 @@ const getUsersOnSearch = async (username, searchkey) => {
       { username: { $regex: searchkey } },
     ],
   })
-    .select("username email fullName -_id")
+    .select("username email fullName profileImg -_id")
     .sort({ username: 1 })
     .limit(10);
   return users;
