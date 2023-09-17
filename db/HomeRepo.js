@@ -86,6 +86,18 @@ const deleteMsgs = async (chatId, msgIds) => {
   );
 };
 
+const updateUserSingleValue = async (username, updateKey, updateValue) => {
+  await User.updateOne({ username }, { [updateKey]: updateValue });
+};
+
+const updateUserMultipleValues = async (username, updateObj) => {
+  await User.updateMany({ username }, updateObj);
+};
+
+const deleteUser = async (username) => {
+  await User.deleteOne({ username });
+};
+
 module.exports = {
   getAllLatestChats,
   addMsgToChat,
@@ -94,4 +106,7 @@ module.exports = {
   getUsersOnSearch,
   getUsernamesByChatId,
   deleteMsgs,
+  updateUserSingleValue,
+  updateUserMultipleValues,
+  deleteUser
 };

@@ -26,10 +26,6 @@ const getUser = async (key, value) => {
   return isObjectEmpty(payload) && payload;
 };
 
-const deleteUser = async (username) => {
-  await User.deleteOne({ username });
-};
-
 const createOTP = async (email) => {
   const alereadyOtp = await Otp.findOne({ email }).exec();
   const otp = Math.floor(100000 + Math.random() * 900000);
@@ -49,7 +45,6 @@ module.exports = {
   addUser,
   updateUser,
   getUser,
-  deleteUser,
   createOTP,
   getOTP,
 };

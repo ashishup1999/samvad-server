@@ -7,6 +7,9 @@ const {
   getUsersOnSearch,
   getUsernamesByChatId,
   deleteMsgs,
+  updateUserSingleValue,
+  updateUserMultipleValues,
+  deleteUser,
 } = require("../db/HomeRepo");
 
 const GetAllLatestChats = async (req, res) => {
@@ -121,6 +124,48 @@ const DeleteMsgs = async (req, res) => {
   }
 };
 
+const UpdateSingleValue = async (req, res) => {
+  try {
+    const { username, key, value } = req.body;
+    await updateUserSingleValue(username, key, value);
+    res.send({ status: "SUCCESS", message: "Message updated Successfuly" });
+  } catch (error) {
+    console.log(error);
+    res.send({
+      status: "ERROR",
+      message: "Unable to update",
+    });
+  }
+};
+
+const UpdateMultipleValues = async (req, res) => {
+  try {
+    const { username, updateDetails } = req.body;
+    await updateUserMultipleValues(username, updateDetails);
+    res.send({ status: "SUCCESS", message: "Message updated Successfuly" });
+  } catch (error) {
+    console.log(error);
+    res.send({
+      status: "ERROR",
+      message: "Unable to update",
+    });
+  }
+};
+
+const DeleteUser = async (req, res) => {
+  try {
+    const { username } = req.params;
+    await deleteUser(username);
+    res.send({ status: "SUCCESS", message: "User Deleted Successfully" });
+  } catch (error) {
+    console.log(error);
+    res.send({
+      status: "ERROR",
+      message: "Unable to delete user",
+    });
+  }
+};
+
 module.exports = {
   GetAllLatestChats,
   CreateChat,
@@ -130,4 +175,7 @@ module.exports = {
   GetUsersOnSearch,
   GetUsernamesByChatId,
   DeleteMsgs,
+  UpdateSingleValue,
+  UpdateMultipleValues,
+  DeleteUser,
 };
