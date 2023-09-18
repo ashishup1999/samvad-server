@@ -1,6 +1,5 @@
 const Chat = require("../model/Chat");
 const User = require("../model/User");
-const { deleteNullUndefinedFromObj } = require("../utils/Utility");
 const { getUserInfo } = require("./CommonRepo");
 
 const getAllLatestChats = async (username) => {
@@ -29,21 +28,46 @@ const createChat = async (usernames) => {
   return res?.chatId;
 };
 
-const addMsgToChat = async (chatId, msgObj) => {
-  const msgPayload = {
-    sender: msgObj.sender,
-    msg: msgObj.msg,
-    type: msgObj.type,
-  };
-  deleteNullUndefinedFromObj(msgPayload);
-  await Chat.updateOne({ chatId }, { $push: { msgs: msgPayload } });
-};
-
-const getChatInfoByChatId = async (username, chatId) => {
-  const { usernames, msgs } = (
-    await Chat.find({ chatId, usernames: username }).exec()
-  )?.[0];
-  const otherUsersInfo = usernames.filter((uname) => uname !== username);
+const getChatInfoByChatId = async (username, chatId, pageNo) => {
+  //update the seenBy
+  await Chat.updateMany(
+    { chatId },
+    { $push: { "msgs.$[ele].seenBy": username } },
+    { arrayFilters: [{ "ele.seenBy": { $ne: username } }] }
+  );
+  //check if user is of new chat (i.e. 0 msgs)
+  const chatInfo = await Chat.findOne({ chatId }).exec();
+  let msgs = [];
+  if (chatInfo?.msgs?.length) {
+    //if user has more than 0 msgs in the chat
+    const res = (
+      await Chat.aggregate([
+        { $match: { chatId, usernames: username } },
+        { $unwind: "$msgs" },
+        { $sort: { "msgs.sentAt": -1 } },
+        {
+          $group: {
+            _id: "$_id",
+            chatId: { $first: "$chatId" },
+            usernames: { $first: "$usernames" },
+            msgs: { $push: "$msgs" },
+          },
+        },
+        {
+          $project: {
+            _id: "$_id",
+            chatId: "$chatId",
+            usernames: "$usernames",
+            msgs: { $slice: ["$msgs", pageNo * 10, 10] },
+          },
+        },
+      ])
+    )?.[0];
+    msgs = res?.msgs;
+  }
+  const otherUsersInfo = chatInfo?.usernames?.filter(
+    (uname) => uname !== username
+  );
   const otherUsers = [];
   for (let i = 0; i < otherUsersInfo.length; i++) {
     const t = await getUserInfo(otherUsersInfo[i]);
@@ -56,7 +80,7 @@ const getChatInfoByChatId = async (username, chatId) => {
       msg: msgObj?.msg,
       sender: msgObj?.sender,
       sentAt: msgObj?.sentAt,
-      seen: msgObj?.seen,
+      seenBy: msgObj?.seenBy,
     })),
   };
 };
@@ -100,7 +124,6 @@ const deleteUser = async (username) => {
 
 module.exports = {
   getAllLatestChats,
-  addMsgToChat,
   createChat,
   getChatInfoByChatId,
   getUsersOnSearch,
@@ -108,5 +131,5 @@ module.exports = {
   deleteMsgs,
   updateUserSingleValue,
   updateUserMultipleValues,
-  deleteUser
+  deleteUser,
 };

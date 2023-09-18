@@ -1,7 +1,6 @@
 const { getUserInfo } = require("../db/CommonRepo");
 const {
   getAllLatestChats,
-  addMsgToChat,
   createChat,
   getChatInfoByChatId,
   getUsersOnSearch,
@@ -20,10 +19,10 @@ const GetAllLatestChats = async (req, res) => {
     for (let i = 0; i < allLatestChats.length; i++) {
       const obj = allLatestChats[i];
       const userInfo = await getUserInfo(obj?.otherUser);
-      const { msgId, msg, sender, sentAt } = obj?.lastMsg;
+      const { msgId, msg, sender, sentAt, seenBy } = obj?.lastMsg;
       result.push({
         chatId: obj?.chatId,
-        lastMsg: { msgId, msg, sender, sentAt },
+        lastMsg: { msgId, msg, sender, sentAt, seenBy },
         ...userInfo,
       });
     }
@@ -44,17 +43,6 @@ const CreateChat = async (req, res) => {
   }
 };
 
-const AddMsgToChat = async (req, res) => {
-  try {
-    const { chatId, msgObj } = req.body;
-    await addMsgToChat(chatId, msgObj);
-    res.send({ status: "SUCCESS" });
-  } catch (error) {
-    console.log(error);
-    res.send({ status: "ERROR" });
-  }
-};
-
 const GetUserInfo = async (req, res) => {
   try {
     const { username } = req.params;
@@ -69,8 +57,8 @@ const GetUserInfo = async (req, res) => {
 const GetChatInfoByChatId = async (req, res) => {
   try {
     const { username } = req.params;
-    const { chatId } = req.query;
-    const result = await getChatInfoByChatId(username, chatId);
+    const { chatId, pageNo } = req.query;
+    const result = await getChatInfoByChatId(username, chatId, pageNo);
     res.send(result);
   } catch (error) {
     console.log(error);
@@ -169,7 +157,6 @@ const DeleteUser = async (req, res) => {
 module.exports = {
   GetAllLatestChats,
   CreateChat,
-  AddMsgToChat,
   GetUserInfo,
   GetChatInfoByChatId,
   GetUsersOnSearch,

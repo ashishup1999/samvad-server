@@ -4,7 +4,6 @@ const {
   GetAllLatestChats,
   CreateChat,
   GetUserInfo,
-  AddMsgToChat,
   GetChatInfoByChatId,
   GetUsersOnSearch,
   GetUsernamesByChatId,
@@ -16,7 +15,6 @@ const {
 
 router.get("/getAllChats/:username", GetAllLatestChats);
 router.post("/createChat", CreateChat);
-router.post("/addMsgToChat", AddMsgToChat);
 router.get("/getUserInfo/:username", GetUserInfo);
 router.get("/getChatInfoByChatId/:username", GetChatInfoByChatId);
 router.get("/getUsersOnSearch/:username", GetUsersOnSearch);
