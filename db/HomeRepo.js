@@ -87,10 +87,17 @@ const getUsernamesByChatId = async (chatId) => {
 };
 
 const getUsersOnSearch = async (username, searchkey) => {
+  if (!searchkey) return [];
   const users = await User.find({
     $and: [
       { username: { $ne: username } },
-      { username: { $regex: searchkey } },
+      { accountActive: true },
+      {
+        $or: [
+          { username: { $regex: searchkey, $options: "i" } },
+          { fullName: { $regex: searchkey, $options: "i" } },
+        ],
+      },
     ],
   })
     .select("username email fullName profileImg -_id")
@@ -114,8 +121,12 @@ const updateUserMultipleValues = async (username, updateObj) => {
   await User.updateMany({ username }, updateObj);
 };
 
-const deleteUser = async (username) => {
-  await User.deleteOne({ username });
+const deactivateUser = async (username) => {
+  await User.updateOne({ username }, { $set: { accountActive: false } });
+};
+
+const activateUser = async (username) => {
+  await User.updateOne({ username }, { $set: { accountActive: true } });
 };
 
 const markAllMsgsSeen = async (username, chatId) => {
@@ -135,6 +146,7 @@ module.exports = {
   deleteMsgs,
   updateUserSingleValue,
   updateUserMultipleValues,
-  deleteUser,
+  deactivateUser,
+  activateUser,
   markAllMsgsSeen,
 };

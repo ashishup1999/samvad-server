@@ -10,7 +10,7 @@ const {
   DeleteMsgs,
   UpdateSingleValue,
   UpdateMultipleValues,
-  DeleteUser,
+  DeactivateUser,
   MarkAllMsgsSeen,
 } = require("../service/HomeService");
 
@@ -23,7 +23,7 @@ router.get("/getUsernamesByChatId/:chatId", GetUsernamesByChatId);
 router.post("/deleteMsgs", DeleteMsgs);
 router.post("/updateUserSingleValue", UpdateSingleValue);
 router.post("/updateUserMultipleValues", UpdateMultipleValues);
-router.get("/deleteUser/:username", DeleteUser);
+router.get("/deactivateUser/:username", DeactivateUser);
 router.get("/markAllMsgsSeen/:username", MarkAllMsgsSeen);
 
 module.exports = router;

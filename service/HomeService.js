@@ -8,9 +8,10 @@ const {
   deleteMsgs,
   updateUserSingleValue,
   updateUserMultipleValues,
-  deleteUser,
+  deactivateUser,
   markAllMsgsSeen,
 } = require("../db/HomeRepo");
+const { encryptData } = require("../utils/Encryption");
 
 const GetAllLatestChats = async (req, res) => {
   try {
@@ -74,7 +75,7 @@ const GetUsernamesByChatId = async (req, res) => {
   try {
     const { chatId } = req.params;
     const usernames = await getUsernamesByChatId(chatId);
-    res.send({ usernames });
+    res.send({ usernames: usernames?.map((uname) => encryptData(uname)) });
   } catch (error) {
     console.log(error);
     res.send({
@@ -88,7 +89,7 @@ const GetUsersOnSearch = async (req, res) => {
   try {
     const { username } = req.params;
     const { search } = req.query;
-    const result = await getUsersOnSearch(username, search);
+    const result = await getUsersOnSearch(username, search?.toLowerCase());
     res.send(result);
   } catch (error) {
     console.log(error);
@@ -141,10 +142,10 @@ const UpdateMultipleValues = async (req, res) => {
   }
 };
 
-const DeleteUser = async (req, res) => {
+const DeactivateUser = async (req, res) => {
   try {
     const { username } = req.params;
-    await deleteUser(username);
+    await deactivateUser(username);
     res.send({ status: "SUCCESS", message: "User Deleted Successfully" });
   } catch (error) {
     console.log(error);
@@ -180,6 +181,6 @@ module.exports = {
   DeleteMsgs,
   UpdateSingleValue,
   UpdateMultipleValues,
-  DeleteUser,
+  DeactivateUser,
   MarkAllMsgsSeen,
 };

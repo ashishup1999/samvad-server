@@ -14,13 +14,16 @@ const updateUser = async (email, updateKey, updateValue) => {
 };
 
 const getUser = async (key, value) => {
-  const userObj = await User.findOne({ [key]: value }).exec();
+  const userObj = await User.findOne({
+    [key]: value,
+  }).exec();
   const payload = {
     username: userObj?.username,
     email: userObj?.email,
     password: userObj?.password,
     fullName: userObj?.fullName,
     profileImg: userObj?.profileImg,
+    accountActive: userObj?.accountActive
   };
   deleteNullUndefinedFromObj(payload);
   return isObjectEmpty(payload) && payload;

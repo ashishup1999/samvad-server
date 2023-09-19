@@ -7,6 +7,7 @@ const {
 } = require("../db/AuthRepo");
 const nodemailer = require("nodemailer");
 const { decryptData } = require("../utils/Encryption");
+const { activateUser } = require("../db/HomeRepo");
 
 const AuthenticateUser = async (req, res) => {
   try {
@@ -14,8 +15,9 @@ const AuthenticateUser = async (req, res) => {
     const user =
       (await getUser("email", email)) || (await getUser("username", username));
     if (!user) {
-      res.send({ status: "ERROR", responseCd: "USER_NOT_FOUND" });
+      res.send({ status: "ERROR", responseCd: "User does not exists" });
     } else if (decryptData(user?.password) === decryptData(password)) {
+      await activateUser(username);
       res.send({
         status: "SUCCESS",
         isAuthenticated: true,
@@ -24,7 +26,7 @@ const AuthenticateUser = async (req, res) => {
         responseCd: "0",
       });
     } else {
-      res.send({ status: "SUCCESS", isAuthenticated: false, responseCd: "0" });
+      res.send({ status: "ERROR", isAuthenticated: false, responseCd: "0" });
     }
   } catch (error) {
     res.send({ status: "ERROR" });
