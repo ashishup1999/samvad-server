@@ -3,15 +3,25 @@ const User = require("../model/User");
 const { getUserInfo } = require("./CommonRepo");
 
 const getAllLatestChats = async (username) => {
-  const allLatestChat = await Chat.find({
-    usernames: username,
-    msgs: { $not: { $size: 0 } },
-  }).exec();
-  return allLatestChat?.map((obj) => ({
+  const allLatestChat = await Chat.aggregate([
+    { $match: { usernames: username, msgs: { $not: { $size: 0 } } } },
+    { $unwind: "$msgs" },
+    { $match: { "msgs.deletedFor": { $ne: username } } },
+    {
+      $group: {
+        _id: "$_id",
+        chatId: { $first: "$chatId" },
+        usernames: { $first: "$usernames" },
+        msgs: { $last: "$msgs" },
+      },
+    },
+  ]).exec();
+  const result = allLatestChat?.map((obj) => ({
     chatId: obj?.chatId,
     otherUser: obj?.usernames?.filter((uname) => uname !== username)?.[0],
-    lastMsg: obj?.msgs?.slice(-1)?.[0],
+    lastMsg: obj?.msgs,
   }));
+  return result;
 };
 
 const createChat = async (usernames) => {
@@ -40,6 +50,7 @@ const getChatInfoByChatId = async (username, chatId, pageNo) => {
       await Chat.aggregate([
         { $match: { chatId, usernames: username } },
         { $unwind: "$msgs" },
+        { $match: { "msgs.deletedFor": { $ne: username } } },
         { $sort: { "msgs.sentAt": -1 } },
         {
           $group: {
@@ -54,7 +65,7 @@ const getChatInfoByChatId = async (username, chatId, pageNo) => {
             _id: "$_id",
             chatId: "$chatId",
             usernames: "$usernames",
-            msgs: { $slice: ["$msgs", pageNo * 10, 10] },
+            msgs: { $slice: ["$msgs", pageNo * 30, 30] }, //30 is items per page
           },
         },
       ])
@@ -106,13 +117,6 @@ const getUsersOnSearch = async (username, searchkey) => {
   return users;
 };
 
-const deleteMsgs = async (chatId, msgIds) => {
-  await Chat.updateMany(
-    { chatId },
-    { $pull: { msgs: { msgId: { $in: msgIds } } } }
-  );
-};
-
 const updateUserSingleValue = async (username, updateKey, updateValue) => {
   await User.updateOne({ username }, { [updateKey]: updateValue });
 };
@@ -134,6 +138,14 @@ const markAllMsgsSeen = async (username, chatId) => {
     { chatId },
     { $push: { "msgs.$[ele].seenBy": username } },
     { arrayFilters: [{ "ele.seenBy": { $ne: username } }] }
+  );
+};
+
+const deleteMsgs = async (username, chatId, msgIds) => {
+  await Chat.updateMany(
+    { chatId },
+    { $push: { "msgs.$[ele].deletedFor": username } },
+    { arrayFilters: [{ "ele.msgId": { $in: msgIds } }] }
   );
 };
 

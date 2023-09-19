@@ -14,6 +14,7 @@ const ChatSchema = new Schema({
         msg: { type: String },
         sender: { type: String },
         type: { type: String, default: "text" },
+        deletedFor: { type: Array, default: [] },
         seenBy: { type: Array, default: [] },
         sentAt: { type: Date },
         deliveredAt: { type: Date },

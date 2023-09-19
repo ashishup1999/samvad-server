@@ -102,14 +102,14 @@ const GetUsersOnSearch = async (req, res) => {
 
 const DeleteMsgs = async (req, res) => {
   try {
-    const { chatId, msgIds } = req.body;
-    await deleteMsgs(chatId, msgIds);
-    res.send({ status: "SUCCESS", message: "Message deleted Successfuly" });
+    const { username, chatId, msgIds } = req.body;
+    await deleteMsgs(username, chatId, msgIds);
+    res.send({ status: "SUCCESS", message: "Messages deleted Successfuly" });
   } catch (error) {
     console.log(error);
     res.send({
       status: "ERROR",
-      message: "unable to delete message at the moment",
+      message: "unable to delete messages at the moment",
     });
   }
 };
