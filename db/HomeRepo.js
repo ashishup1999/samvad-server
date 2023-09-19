@@ -30,11 +30,7 @@ const createChat = async (usernames) => {
 
 const getChatInfoByChatId = async (username, chatId, pageNo) => {
   //update the seenBy
-  await Chat.updateMany(
-    { chatId },
-    { $push: { "msgs.$[ele].seenBy": username } },
-    { arrayFilters: [{ "ele.seenBy": { $ne: username } }] }
-  );
+  await markAllMsgsSeen(username, chatId);
   //check if user is of new chat (i.e. 0 msgs)
   const chatInfo = await Chat.findOne({ chatId }).exec();
   let msgs = [];
@@ -122,6 +118,14 @@ const deleteUser = async (username) => {
   await User.deleteOne({ username });
 };
 
+const markAllMsgsSeen = async (username, chatId) => {
+  await Chat.updateMany(
+    { chatId },
+    { $push: { "msgs.$[ele].seenBy": username } },
+    { arrayFilters: [{ "ele.seenBy": { $ne: username } }] }
+  );
+};
+
 module.exports = {
   getAllLatestChats,
   createChat,
@@ -132,4 +136,5 @@ module.exports = {
   updateUserSingleValue,
   updateUserMultipleValues,
   deleteUser,
+  markAllMsgsSeen,
 };

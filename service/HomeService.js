@@ -9,6 +9,7 @@ const {
   updateUserSingleValue,
   updateUserMultipleValues,
   deleteUser,
+  markAllMsgsSeen,
 } = require("../db/HomeRepo");
 
 const GetAllLatestChats = async (req, res) => {
@@ -154,6 +155,21 @@ const DeleteUser = async (req, res) => {
   }
 };
 
+const MarkAllMsgsSeen = async (req, res) => {
+  try {
+    const { username } = req.params;
+    const { chatId } = req.query;
+    await markAllMsgsSeen(username, chatId);
+    res.send({ status: "SUCCESS", message: "Seen status updated" });
+  } catch (error) {
+    console.log(error);
+    res.send({
+      status: "ERROR",
+      message: "Unable to update seen status",
+    });
+  }
+};
+
 module.exports = {
   GetAllLatestChats,
   CreateChat,
@@ -165,4 +181,5 @@ module.exports = {
   UpdateSingleValue,
   UpdateMultipleValues,
   DeleteUser,
+  MarkAllMsgsSeen,
 };

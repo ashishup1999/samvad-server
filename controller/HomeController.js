@@ -11,6 +11,7 @@ const {
   UpdateSingleValue,
   UpdateMultipleValues,
   DeleteUser,
+  MarkAllMsgsSeen,
 } = require("../service/HomeService");
 
 router.get("/getAllChats/:username", GetAllLatestChats);
@@ -23,5 +24,6 @@ router.post("/deleteMsgs", DeleteMsgs);
 router.post("/updateUserSingleValue", UpdateSingleValue);
 router.post("/updateUserMultipleValues", UpdateMultipleValues);
 router.get("/deleteUser/:username", DeleteUser);
+router.get("/markAllMsgsSeen/:username", MarkAllMsgsSeen);
 
 module.exports = router;
