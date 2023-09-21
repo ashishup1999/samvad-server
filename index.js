@@ -33,12 +33,12 @@ const io = new Server(chatServer, {
 require("./controller/SocketController")(io); // passing io to socket controller
 
 chatServer.listen(process.env.CHAT_SERVER_PORT, () => {
-  console.log("CHAT SERVER ACTIVE ON PORT: ", 3001);
+  console.log("CHAT SERVER ACTIVE ON PORT: ", process.env.CHAT_SERVER_PORT);
 });
 
 app.listen(process.env.API_SERVER_PORT, function (err) {
   if (err) console.log(err);
-  console.log("API SERVER ACTIVE ON PORT: ", 3002);
+  console.log("API SERVER ACTIVE ON PORT: ", process.env.API_SERVER_PORT);
 });
 
 module.exports = {};
