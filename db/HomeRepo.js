@@ -70,7 +70,7 @@ const getChatInfoByChatId = async (username, chatId, pageNo) => {
         },
       ])
     )?.[0];
-    msgs = res?.msgs;
+    msgs = res ? res?.msgs : [];
   }
   const otherUsersInfo = chatInfo?.usernames?.filter(
     (uname) => uname !== username
